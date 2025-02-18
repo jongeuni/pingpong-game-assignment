@@ -178,20 +178,16 @@ public class RoomService {
         Optional<Room> room= roomRepository.findById(roomId);
         // 방이 대기 상태여야 한다
         if (room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT)) {
-            System.out.println("1");
             return new ApiResponse<>(201);
         }
         // 유저는 방의 호스트여야 한다
         if (room.get().getHost() != userId) {
-
-            System.out.println("2");
             return new ApiResponse<>(201);
         }
 
         int maxUser = getMaxUser(room.get().getRoomType());
         // 방 정원이 꽉 차 있어야 한다
         if (!verifyMaxUser(roomId, maxUser)) {
-            System.out.println("3");
             return new ApiResponse<>(201);
         }
 

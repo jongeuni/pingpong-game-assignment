@@ -5,6 +5,7 @@ import com.prography.pingpong.room.entity.RoomStatusType;
 import com.prography.pingpong.room.repository.RoomRepository;
 import com.prography.pingpong.room.repository.UserRoomRepository;
 import com.prography.pingpong.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class AsyncGameService {
     private final RoomRepository roomRepository;
 
     @Async
+    @Transactional
     public void scheduleRoomFinish(int roomId) {
         try {
             Thread.sleep(60000);
