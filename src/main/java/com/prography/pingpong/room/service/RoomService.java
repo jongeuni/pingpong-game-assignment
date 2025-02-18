@@ -1,6 +1,7 @@
 package com.prography.pingpong.room.service;
 
 import com.prography.pingpong.common.rs.ApiResponse;
+import com.prography.pingpong.common.rs.utile.DateUtil;
 import com.prography.pingpong.room.dto.TeamCountDto;
 import com.prography.pingpong.room.entity.Room;
 import com.prography.pingpong.room.entity.RoomStatusType;
@@ -34,6 +35,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final AsyncGameService asyncGameService;
 
+    // 방 생성
     public ApiResponse<Void> createRoom(RoomCreateRq rq) {
         Optional<User> user = userRepository.findById(rq.getUserId());
 
@@ -57,6 +59,7 @@ public class RoomService {
         return new ApiResponse<>(200);
     }
 
+    // 방 목록 조회
     public RoomListRs readRoomList(int page, int size) {
         Page<Room> rooms = roomRepository.findAllByOrderByIdAsc(PageRequest.of(page, size));
 
@@ -65,8 +68,8 @@ public class RoomService {
         return new RoomListRs(rooms.getTotalElements(), rooms.getTotalPages(), roomItemRs);
     }
 
+    // 방 상세 조회
     public ApiResponse<RoomDetailRs> readRoomDetail(int roomId) {
-        // 방이 비어있을 경우
         Optional<Room> roomEntity = roomRepository.findById(roomId);
 
         if (roomEntity.isEmpty()) {
@@ -80,16 +83,11 @@ public class RoomService {
                 room.getHost(),
                 room.getRoomType(),
                 room.getStatus(),
-                dateFormatChange(room.getCreatedAt()),
-                dateFormatChange(room.getUpdatedAt())
+                DateUtil.dateFormat(room.getCreatedAt()),
+                DateUtil.dateFormat(room.getUpdatedAt())
         );
         return new ApiResponse<>(200, rs);
 
-    }
-
-    private String dateFormatChange(Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return dateFormat.format(date);
     }
 
     public ApiResponse<Void> joinRoom(int userId, int roomId) {

@@ -1,5 +1,6 @@
 package com.prography.pingpong.user.service;
 
+import com.prography.pingpong.common.rs.utile.DateUtil;
 import com.prography.pingpong.user.entity.User;
 import com.prography.pingpong.user.repository.UserRepository;
 import com.prography.pingpong.user.rqrs.UserItemRs;
@@ -27,16 +28,11 @@ public class UserService {
                 user.getName(),
                 user.getEmail(),
                 user.getStatus().toString(),
-                dateFormatChange(user.getCreatedAt()),
-                dateFormatChange(user.getUpdatedAt())
+                DateUtil.dateFormat(user.getCreatedAt()),
+                DateUtil.dateFormat(user.getUpdatedAt())
                 )).stream().toList();
 
         return new UserListRs(users.getTotalElements(), users.getTotalPages(), userItemRs);
-    }
-
-    private String dateFormatChange(Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return dateFormat.format(date);
     }
 
 }
