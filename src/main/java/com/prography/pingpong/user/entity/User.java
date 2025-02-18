@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-@Entity()
+@Entity
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
-@Table(name = "user")
+@Table(name = "users")
 public class User {
     @Id
     private int id;
@@ -25,7 +25,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    private Date createdAt;
+    private Date createdAt = new Date();
 
-    private Date updatedAt;
+    private Date updatedAt = new Date();
 }
