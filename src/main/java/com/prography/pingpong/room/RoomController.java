@@ -39,12 +39,13 @@ public class RoomController {
         return roomService.outRoom(rq.getUserId(), roomId);
     }
 
-    // game start
     @PutMapping("/room/start/{roomId}")
     public ApiResponse<Void> gameStart(@PathVariable("roomId") int roomId, @RequestBody UserIdRq rq) {
         return roomService.gameStart(rq.getUserId(), roomId);
     }
 
-    // team change
-
+    @PutMapping("/team/{roomId}")
+    public ApiResponse<Void> changeTeam(@PathVariable("roomId") int roomId, @RequestBody UserIdRq rq) {
+        return roomService.teamChange(rq.getUserId(), roomId);
+    }
 }

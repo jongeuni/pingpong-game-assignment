@@ -22,4 +22,8 @@ public class UserRoom {
         this.userId = userId;
         this.team = team;
     }
+
+    public void changeTeam(String team) {
+        this.team = team;
+    }
 }

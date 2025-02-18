@@ -209,4 +209,48 @@ public class RoomService {
         return userRooms.size() >= maxUser;
     }
 
+    @Transactional
+    public ApiResponse<Void> teamChange(int userId, int roomId) {
+        List<UserRoom> userRooms = userRoomRepository.findByRoomId(roomId);
+        Optional<UserRoom> userRoom = userRooms.stream()
+                .filter(ur -> ur.getUserId() == userId)
+                .findFirst();
+
+        // 유저가 방에 참여한 상태여야 한다
+        if(userRoom.isEmpty()) {
+            return new ApiResponse<>(201);
+        }
+
+        Optional<Room> room= roomRepository.findById(roomId);
+        // 방이 대기 상태여야 한다
+        if (room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT)) {
+            return new ApiResponse<>(201);
+        }
+
+        String changeTeam = userRoom.get().getTeam().equals("RED") ? "BLUE" : "RED";
+
+        int redCount = 0;
+        int blueCount = 0;
+
+        for (UserRoom ur : userRooms) {
+            if ("RED".equals(ur.getTeam())) {
+                redCount++;
+            } else if ("BLUE".equals(ur.getTeam())) {
+                blueCount++;
+            }
+        }
+
+        RoomType roomType = room.get().getRoomType();
+        if(changeTeam.equals("RED") && redCount >= roomType.getMaxUser()/2) {
+            return new ApiResponse<>(201);
+        }
+        if (changeTeam.equals("BLUE") && blueCount >= roomType.getMaxUser()/2) {
+            return new ApiResponse<>(201);
+        }
+
+        userRoom.get().changeTeam(changeTeam);
+
+        return new ApiResponse<>(200);
+    }
+
 }
