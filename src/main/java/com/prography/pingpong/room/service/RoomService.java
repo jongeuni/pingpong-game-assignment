@@ -18,6 +18,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -31,6 +33,7 @@ public class RoomService {
     private final UserRepository userRepository;
     private final UserRoomRepository userRoomRepository;
     private final RoomRepository roomRepository;
+    private final AsyncGameService asyncGameService;
 
     public ApiResponse<Void> createRoom(RoomCreateRq rq) {
         Optional<User> user = userRepository.findById(rq.getUserId());
@@ -111,7 +114,7 @@ public class RoomService {
             return new ApiResponse<>(201);
         }
 
-        int maxUser = room.get().getRoomType().equals(RoomType.SINGLE) ? 2 : 4;
+        int maxUser = getMaxUser(room.get().getRoomType());
 
         List<UserRoom> userRooms = userRoomRepository.findByRoomId(roomId);
 
@@ -168,4 +171,46 @@ public class RoomService {
 
         return new ApiResponse<>(200);
     }
+
+//    @Transactional
+
+    public ApiResponse<Void> gameStart(int userId, int roomId) {
+        Optional<Room> room= roomRepository.findById(roomId);
+        // 방이 대기 상태여야 한다
+        if (room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT)) {
+            System.out.println("1");
+            return new ApiResponse<>(201);
+        }
+        // 유저는 방의 호스트여야 한다
+        if (room.get().getHost() != userId) {
+
+            System.out.println("2");
+            return new ApiResponse<>(201);
+        }
+
+        int maxUser = getMaxUser(room.get().getRoomType());
+        // 방 정원이 꽉 차 있어야 한다
+        if (!verifyMaxUser(roomId, maxUser)) {
+            System.out.println("3");
+            return new ApiResponse<>(201);
+        }
+
+        room.get().updateStatus(RoomStatusType.PROGRESS);
+        roomRepository.save(room.get());
+
+        asyncGameService.scheduleRoomFinish(roomId);
+
+        return new ApiResponse<>(200);
+    }
+
+    private int getMaxUser(RoomType roomType) {
+        return RoomType.SINGLE.equals(roomType) ? 2 : 4;
+    }
+
+    private boolean verifyMaxUser(int roomId, int maxUser) {
+        List<UserRoom> userRooms = userRoomRepository.findByRoomId(roomId);
+
+        return userRooms.size() >= maxUser;
+    }
+
 }
