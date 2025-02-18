@@ -2,13 +2,14 @@ package com.prography.pingpong.user.service;
 
 import com.prography.pingpong.room.repository.RoomRepository;
 import com.prography.pingpong.room.repository.UserRoomRepository;
+import com.prography.pingpong.user.api.UserReadApiClient;
+import com.prography.pingpong.user.api.UserReadApiRs;
 import com.prography.pingpong.user.entity.User;
 import com.prography.pingpong.user.entity.UserStatus;
 import com.prography.pingpong.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -17,7 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserInitService {
-    private final FakerApiClient fakerApiClient;
+    private final UserReadApiClient fakerApiClient;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final UserRoomRepository userRoomRepository;
@@ -26,7 +27,7 @@ public class UserInitService {
     public void init(int seed, int quantity) {
         deleteAll();
 
-        FakerApiRs apiRs = fakerApiClient.fetchUsers(seed, quantity, "ko_KR");
+        UserReadApiRs apiRs = fakerApiClient.fetchUsers(seed, quantity, "ko_KR");
 
         List<User> users = apiRs.getData().stream().map(user -> User.builder()
                 .id(user.getId())

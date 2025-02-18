@@ -1,10 +1,9 @@
-package com.prography.pingpong.user.service;
+package com.prography.pingpong.user.api;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-public class FakerApiUserRs {
+public class UserReadApiData {
     private Integer id;
     private String uuid;
     private String firstname;

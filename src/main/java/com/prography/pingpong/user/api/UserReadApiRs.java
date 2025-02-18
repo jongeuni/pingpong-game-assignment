@@ -1,17 +1,16 @@
-package com.prography.pingpong.user.service;
+package com.prography.pingpong.user.api;
 
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
-public class FakerApiRs {
+public class UserReadApiRs {
     private String status;
     private Integer code;
     private String locale;
     private String seed;
     private Integer total;
-    private List<FakerApiUserRs> data;
+    private List<UserReadApiData> data;
 }
