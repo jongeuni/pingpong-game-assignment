@@ -41,4 +41,8 @@ public class Room {
         this.createdAt = new Date();
         this.updatedAt = new Date();
     }
+
+    public void updateStatus(RoomStatusType type) {
+        this.status = type;
+    }
 }
