@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserInitService userInitService;
 
-    // user init controller - api call
     @PostMapping("/init")
     public ApiResponse<Void> init(@RequestBody UserInitRq rq) {
+
+        userInitService.init(rq.getSeed(), rq.getQuantity());
         return new ApiResponse<>(200);
     }
 

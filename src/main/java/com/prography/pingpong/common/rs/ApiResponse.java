@@ -1,5 +1,10 @@
 package com.prography.pingpong.common.rs;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@AllArgsConstructor
+@Getter
 public class ApiResponse<T> {
     private Integer code;
     private String message;

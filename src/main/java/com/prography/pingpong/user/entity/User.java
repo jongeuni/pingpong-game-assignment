@@ -2,8 +2,11 @@ package com.prography.pingpong.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
 
@@ -11,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
+@Builder
 @Table(name = "users")
 public class User {
     @Id
@@ -25,7 +29,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
-    private Date createdAt = new Date();
+    @CreatedDate
+    private Date createdAt;
 
-    private Date updatedAt = new Date();
+    @LastModifiedDate
+    private Date updatedAt;
 }
