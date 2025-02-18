@@ -18,8 +18,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -42,7 +40,7 @@ public class RoomService {
             return new ApiResponse<>(201);
         }
 
-        if (!user.get().getStatus().equals(UserStatus.ACTIVE)) {
+        if (isUserNotActive(user.get())) {
             return new ApiResponse<>(201);
         }
 
@@ -67,6 +65,7 @@ public class RoomService {
     }
 
     public ApiResponse<RoomDetailRs> readRoomDetail(int roomId) {
+        // 방이 비어있을 경우
         Optional<Room> roomEntity = roomRepository.findById(roomId);
 
         if (roomEntity.isEmpty()) {
@@ -97,15 +96,16 @@ public class RoomService {
         Optional<Room> room = roomRepository.findById(roomId);
         Optional<User> user = userRepository.findById(userId);
 
-        if(room.isEmpty() || user.isEmpty()) {
+        // 유저가 비어있을 경우
+        if(user.isEmpty()) {
             return new ApiResponse<>(201);
         }
-        // 방이 대기 상태여야 한다
-        if(!room.get().getStatus().equals(RoomStatusType.WAIT)) {
+
+        if (isRoomWaitStatus(room)) {
             return new ApiResponse<>(201);
         }
-        // 유저가 활성 상태여야 한다
-        if(!user.get().getStatus().equals(UserStatus.ACTIVE)) {
+
+        if(isUserNotActive(user.get())) {
             return new ApiResponse<>(201);
         }
 
@@ -128,6 +128,10 @@ public class RoomService {
         userRoomRepository.save(userRoom);
 
         return new ApiResponse<>(200);
+    }
+
+    private boolean isUserNotActive(User user) {
+        return user.getStatus() != UserStatus.ACTIVE;
     }
 
     private String getTeam(List<UserRoom> userRooms) {
@@ -156,8 +160,8 @@ public class RoomService {
         }
 
         Optional<Room> room= roomRepository.findById(roomId);
-        // 방이 대기 상태여야 한다
-        if (room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT)) {
+
+        if (isRoomWaitStatus(room)) {
             return new ApiResponse<>(201);
         }
 
@@ -172,12 +176,10 @@ public class RoomService {
         return new ApiResponse<>(200);
     }
 
-//    @Transactional
-
     public ApiResponse<Void> gameStart(int userId, int roomId) {
         Optional<Room> room= roomRepository.findById(roomId);
-        // 방이 대기 상태여야 한다
-        if (room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT)) {
+
+        if (isRoomWaitStatus(room)) {
             return new ApiResponse<>(201);
         }
         // 유저는 방의 호스트여야 한다
@@ -222,8 +224,8 @@ public class RoomService {
         }
 
         Optional<Room> room= roomRepository.findById(roomId);
-        // 방이 대기 상태여야 한다
-        if (room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT)) {
+
+        if (isRoomWaitStatus(room)) {
             return new ApiResponse<>(201);
         }
 
@@ -251,6 +253,11 @@ public class RoomService {
         userRoom.get().changeTeam(changeTeam);
 
         return new ApiResponse<>(200);
+    }
+
+    // 방은 대기 상태여야 한다
+    private boolean isRoomWaitStatus(Optional<Room> room) {
+        return room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT);
     }
 
 }
