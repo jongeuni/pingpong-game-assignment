@@ -14,6 +14,16 @@ public class ApiResponse<T> {
 
     public ApiResponse(Integer code) {
         this.code = code;
+        setMessage(code);
+    }
+
+    public ApiResponse(Integer code, T result) {
+        this.code = code;
+        setMessage(code);
+        this.result = result;
+    }
+
+    private void setMessage(int code) {
         if(code == 200) {
             this.message = "API 요청이 성공했습니다.";
         } else if (code == 201) {

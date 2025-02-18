@@ -8,7 +8,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class UserListRs {
-    private int totalElements;
+    private long totalElements;
     private int totalPages;
     private List<UserItemRs> userList;
 }

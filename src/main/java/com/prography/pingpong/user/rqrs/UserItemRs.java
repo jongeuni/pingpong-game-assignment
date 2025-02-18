@@ -13,6 +13,6 @@ public class UserItemRs {
     private String name;
     private String email;
     private String status;
-    private Date createdAt;
-    private Date updatedAt;
+    private String createdAt;
+    private String updatedAt;
 }
