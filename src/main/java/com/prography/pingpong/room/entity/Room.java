@@ -15,6 +15,7 @@ import java.util.Date;
 @Table(name = "rooms")
 public class Room {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String title;
@@ -28,7 +29,16 @@ public class Room {
     @Enumerated(EnumType.STRING)
     private RoomStatusType status;
 
-    private Date createdAt = new Date();
+    private Date createdAt;
 
-    private Date updatedAt = new Date();
+    private Date updatedAt;
+
+    public Room(String title, int host, RoomType roomType, RoomStatusType status) {
+        this.title = title;
+        this.host = host;
+        this.roomType = roomType;
+        this.status = status;
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+    }
 }
