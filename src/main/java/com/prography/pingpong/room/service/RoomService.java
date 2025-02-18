@@ -1,6 +1,7 @@
 package com.prography.pingpong.room.service;
 
 import com.prography.pingpong.common.rs.ApiResponse;
+import com.prography.pingpong.room.dto.TeamCountDto;
 import com.prography.pingpong.room.entity.Room;
 import com.prography.pingpong.room.entity.RoomStatusType;
 import com.prography.pingpong.room.entity.RoomType;
@@ -135,17 +136,9 @@ public class RoomService {
     }
 
     private String getTeam(List<UserRoom> userRooms) {
-        int redCount = 0;
-        int blueCount = 0;
+        TeamCountDto teamCount = teamCount(userRooms);
 
-        for (UserRoom userRoom : userRooms) {
-            if ("RED".equals(userRoom.getTeam())) {
-                redCount++;
-            } else if ("BLUE".equals(userRoom.getTeam())) {
-                blueCount++;
-            }
-        }
-        if (redCount > blueCount) {
+        if (teamCount.getRed() > teamCount.getBlue()) {
             return "BLUE";
         }
         return "RED";
@@ -231,22 +224,13 @@ public class RoomService {
 
         String changeTeam = userRoom.get().getTeam().equals("RED") ? "BLUE" : "RED";
 
-        int redCount = 0;
-        int blueCount = 0;
-
-        for (UserRoom ur : userRooms) {
-            if ("RED".equals(ur.getTeam())) {
-                redCount++;
-            } else if ("BLUE".equals(ur.getTeam())) {
-                blueCount++;
-            }
-        }
+        TeamCountDto teamCount = teamCount(userRooms);
 
         RoomType roomType = room.get().getRoomType();
-        if(changeTeam.equals("RED") && redCount >= roomType.getMaxUser()/2) {
+        if(changeTeam.equals("RED") && teamCount.getRed() >= roomType.getMaxUser()/2) {
             return new ApiResponse<>(201);
         }
-        if (changeTeam.equals("BLUE") && blueCount >= roomType.getMaxUser()/2) {
+        if (changeTeam.equals("BLUE") && teamCount.getBlue() >= roomType.getMaxUser()/2) {
             return new ApiResponse<>(201);
         }
 
@@ -258,6 +242,20 @@ public class RoomService {
     // 방은 대기 상태여야 한다
     private boolean isRoomWaitStatus(Optional<Room> room) {
         return room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT);
+    }
+
+    private TeamCountDto teamCount(List<UserRoom> userRooms) {
+        int redCount = 0;
+        int blueCount = 0;
+
+        for (UserRoom ur : userRooms) {
+            if ("RED".equals(ur.getTeam())) {
+                redCount++;
+            } else if ("BLUE".equals(ur.getTeam())) {
+                blueCount++;
+            }
+        }
+        return new TeamCountDto(redCount, blueCount);
     }
 
 }
