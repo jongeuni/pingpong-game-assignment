@@ -39,11 +39,7 @@ public class RoomService {
     public ApiResponse<Void> createRoom(RoomCreateRq rq) {
         Optional<User> user = userRepository.findById(rq.getUserId());
 
-        if (user.isEmpty()) {
-            return new ApiResponse<>(201);
-        }
-
-        if (isUserNotActive(user.get())) {
+        if (isNotUserActive(user)) {
             return new ApiResponse<>(201);
         }
 
@@ -90,25 +86,18 @@ public class RoomService {
 
     }
 
+    // 방 참여
     public ApiResponse<Void> joinRoom(int userId, int roomId) {
+        Optional<User> user = userRepository.findById(userId);
+        if(isNotUserActive(user)) {
+            return new ApiResponse<>(201);
+        }
 
         Optional<Room> room = roomRepository.findById(roomId);
-        Optional<User> user = userRepository.findById(userId);
-
-        // 유저가 비어있을 경우
-        if(user.isEmpty()) {
+        if (isNotRoomWaitStatus(room)) {
             return new ApiResponse<>(201);
         }
 
-        if (isRoomWaitStatus(room)) {
-            return new ApiResponse<>(201);
-        }
-
-        if(isUserNotActive(user.get())) {
-            return new ApiResponse<>(201);
-        }
-
-        // 유저가 현재 참여한 방이 없어야 한다
         if (userRoomRepository.existsByUserId(userId)) {
             return new ApiResponse<>(201);
         }
@@ -129,8 +118,8 @@ public class RoomService {
         return new ApiResponse<>(200);
     }
 
-    private boolean isUserNotActive(User user) {
-        return user.getStatus() != UserStatus.ACTIVE;
+    private boolean isNotUserActive(Optional<User> user) {
+        return user.isEmpty() || user.get().getStatus() != UserStatus.ACTIVE;
     }
 
     private String getTeam(List<UserRoom> userRooms) {
@@ -142,6 +131,7 @@ public class RoomService {
         return "RED";
     }
 
+    // 방 나가기
     @Transactional
     public ApiResponse<Void> outRoom(int userId, int roomId) {
         Optional<UserRoom> userRoom = userRoomRepository.findByUserIdAndRoomId(userId, roomId);
@@ -152,7 +142,7 @@ public class RoomService {
 
         Optional<Room> room= roomRepository.findById(roomId);
 
-        if (isRoomWaitStatus(room)) {
+        if (isNotRoomWaitStatus(room)) {
             return new ApiResponse<>(201);
         }
 
@@ -167,10 +157,11 @@ public class RoomService {
         return new ApiResponse<>(200);
     }
 
+    // 게임 시작
     public ApiResponse<Void> gameStart(int userId, int roomId) {
         Optional<Room> room= roomRepository.findById(roomId);
 
-        if (isRoomWaitStatus(room)) {
+        if (isNotRoomWaitStatus(room)) {
             return new ApiResponse<>(201);
         }
         // 유저는 방의 호스트여야 한다
@@ -202,6 +193,7 @@ public class RoomService {
         return userRooms.size() >= maxUser;
     }
 
+    // 팀 변경
     @Transactional
     public ApiResponse<Void> teamChange(int userId, int roomId) {
         List<UserRoom> userRooms = userRoomRepository.findByRoomId(roomId);
@@ -216,7 +208,7 @@ public class RoomService {
 
         Optional<Room> room= roomRepository.findById(roomId);
 
-        if (isRoomWaitStatus(room)) {
+        if (isNotRoomWaitStatus(room)) {
             return new ApiResponse<>(201);
         }
 
@@ -237,8 +229,7 @@ public class RoomService {
         return new ApiResponse<>(200);
     }
 
-    // 방은 대기 상태여야 한다
-    private boolean isRoomWaitStatus(Optional<Room> room) {
+    private boolean isNotRoomWaitStatus(Optional<Room> room) {
         return room.isEmpty() || !room.get().getStatus().equals(RoomStatusType.WAIT);
     }
 
