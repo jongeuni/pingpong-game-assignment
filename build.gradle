@@ -36,7 +36,13 @@ dependencies {
 	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.2.0'
+	testImplementation("org.junit.platform:junit-platform-launcher:1.5.2")
+	testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+	testImplementation("org.junit.vintage:junit-vintage-engine") {
+		exclude group: "org.hamcrest", module: "hamcrest-core"
+	}
 }
+
 
 tasks.named('test') {
 	useJUnitPlatform()
